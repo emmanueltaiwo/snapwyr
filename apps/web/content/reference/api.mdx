@@ -1,0 +1,352 @@
+---
+title: API Reference
+description: Complete API reference for Snapwyr
+---
+
+# API Reference
+
+Complete reference for all Snapwyr APIs.
+
+## Core SDK
+
+### `logRequests(config?)`
+
+Start logging outgoing HTTP requests (fetch, axios).
+
+```javascript
+import { logRequests } from 'snapwyr';
+
+// Log fetch requests (automatic)
+logRequests();
+
+// To log axios requests, pass your axios instance
+import axios from 'axios';
+logRequests({
+  axios: axios, // Required for axios interception
+  logBody: true,
+});
+
+// Or with a custom axios instance
+const apiClient = axios.create({ baseURL: 'https://api.example.com' });
+logRequests({
+  axios: apiClient, // Required for axios interception
+});
+```
+
+### `stopLogging()`
+
+Stop logging outgoing HTTP requests.
+
+```javascript
+import { logRequests, stopLogging } from 'snapwyr';
+
+logRequests();
+// ... later
+stopLogging();
+```
+
+### `toCurl(params)`
+
+Generate a cURL command from request data.
+
+```javascript
+import { toCurl } from 'snapwyr';
+
+const curl = toCurl({
+  method: 'POST',
+  url: 'https://api.example.com/users',
+  headers: { 'Content-Type': 'application/json' },
+  body: '{"name":"John"}',
+});
+```
+
+### `generateRequestId()`
+
+Generate a unique request ID.
+
+```javascript
+import { generateRequestId } from 'snapwyr';
+
+const id = generateRequestId(); // "m2x9k-a3b7c"
+```
+
+## Dashboard
+
+### `serve(port, options?)`
+
+Start the dashboard server.
+
+```javascript
+import { serve } from 'snapwyr/dashboard';
+
+serve(3333);
+
+serve(3333, {
+  host: 'localhost',
+  open: true,
+  maxRequests: 1000,
+});
+```
+
+**Options:**
+
+- `host` - Bind address (default: `'localhost'`)
+- `open` - Auto-open browser (default: `false`)
+- `maxRequests` - Maximum requests to store (default: `1000`)
+
+### `stop()`
+
+Stop the dashboard server.
+
+```javascript
+import { stop } from 'snapwyr/dashboard';
+
+stop();
+```
+
+### `pushRequest(entry)`
+
+Manually push a request to the dashboard.
+
+```javascript
+import { pushRequest } from 'snapwyr/dashboard';
+
+pushRequest({
+  id: 'unique-id',
+  timestamp: new Date().toISOString(),
+  method: 'GET',
+  url: '/api/users',
+  status: 200,
+  duration: 45,
+  slow: false,
+  direction: 'incoming',
+});
+```
+
+## Types
+
+### `SnapWyrConfig`
+
+Configuration interface for Snapwyr.
+
+```typescript
+interface SnapWyrConfig {
+  // Output
+  format?: 'pretty' | 'json';
+  emoji?: boolean;
+  silent?: boolean;
+  prefix?: string;
+  showTimestamp?: boolean;
+
+  // Body logging
+  logBody?: boolean;
+  bodySizeLimit?: number;
+
+  // Filtering
+  errorsOnly?: boolean;
+  methods?: string[];
+  statusCodes?: number[];
+  ignorePatterns?: (string | RegExp)[];
+
+  // Features
+  slowThreshold?: number;
+  requestId?: boolean;
+  sizeTracking?: boolean;
+  redact?: (string | RegExp)[];
+
+  // Advanced
+  transport?: (entry: LogEntry) => void;
+  enabled?: boolean;
+}
+```
+
+### `LogEntry`
+
+Log entry passed to transport function and dashboard.
+
+```typescript
+interface LogEntry {
+  id: string;
+  timestamp: string;
+  method: string;
+  url: string;
+  status: number | undefined;
+  duration: number;
+  slow: boolean;
+  error?: string;
+  requestBody?: string;
+  responseBody?: string;
+  prefix?: string;
+  requestSize?: number;
+  responseSize?: number;
+  totalSize?: number;
+  direction?: 'incoming' | 'outgoing';
+}
+```
+
+### `RequestEvent`
+
+Event emitted when an HTTP request completes.
+
+```typescript
+interface RequestEvent {
+  id: string;
+  method: string;
+  url: string;
+  status?: number;
+  duration: number;
+  timestamp: number;
+  requestBody?: string;
+  responseBody?: string;
+  error?: string;
+  headers?: Record<string, string>;
+  requestSize?: number;
+  responseSize?: number;
+  direction?: 'incoming' | 'outgoing';
+}
+```
+
+## Framework Middleware
+
+All middleware accepts `SnapWyrConfig` options.
+
+### Express
+
+```javascript
+import express from 'express';
+import { snapwyr } from 'snapwyr/express';
+
+const app = express();
+app.use(snapwyr({ logBody: true }));
+```
+
+### Fastify
+
+```javascript
+import Fastify from 'fastify';
+import { snapwyr } from 'snapwyr/fastify';
+
+const fastify = Fastify();
+fastify.register(snapwyr, { logBody: true });
+```
+
+### Koa
+
+```javascript
+import Koa from 'koa';
+import { snapwyr } from 'snapwyr/koa';
+
+const app = new Koa();
+app.use(snapwyr({ logBody: true }));
+```
+
+### Hono
+
+```typescript
+import { Hono } from 'hono';
+import { snapwyr } from 'snapwyr/hono';
+
+const app = new Hono();
+app.use('*', snapwyr({ logBody: true }));
+```
+
+### NestJS
+
+```typescript
+import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { SnapwyrInterceptor } from 'snapwyr/nestjs';
+
+@Module({
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useValue: SnapwyrInterceptor({ logBody: true }),
+    },
+  ],
+})
+export class AppModule {}
+```
+
+### Next.js
+
+```typescript
+// proxy.ts
+import { snapwyr } from 'snapwyr/nextjs';
+
+export const proxy = snapwyr({ logBody: true });
+
+export const config = {
+  matcher: '/api/:path*',
+};
+```
+
+## Console Output
+
+### Pretty Format (default)
+
+```
+12:34:56 GET    200  45ms   /api/users
+12:34:57 POST   201  89ms   /api/users
+12:34:58 GET    404  12ms   /api/unknown
+```
+
+### JSON Format
+
+```json
+{
+  "id": "m2x9k",
+  "timestamp": "2024-01-15T12:34:56.789Z",
+  "method": "GET",
+  "url": "/api/users",
+  "status": 200,
+  "duration": 45
+}
+```
+
+### Color Coding
+
+- **Method:** GET (blue), POST (green), PUT (yellow), PATCH (magenta), DELETE (red)
+- **Status:** 2xx (green), 3xx (cyan), 4xx (yellow), 5xx (red)
+- **Duration:** fast (green), medium (yellow), slow (red)
+
+## Production Behavior
+
+All functions automatically disable when `NODE_ENV === 'production'`:
+
+- `logRequests()` does nothing
+- Middleware does nothing
+- Zero performance overhead
+
+To enable in production:
+
+```javascript
+snapwyr({ enabled: true });
+```
+
+## Supported HTTP Clients
+
+`logRequests()` automatically intercepts:
+
+- `globalThis.fetch` (Node.js 18+) - Automatic, no configuration needed
+- `axios` - Requires passing your axios instance in the config
+
+**Example:**
+
+```javascript
+import { logRequests } from 'snapwyr';
+import axios from 'axios';
+
+// Fetch is logged automatically
+logRequests();
+await fetch('https://api.example.com/users');
+
+// Axios requires passing the instance
+logRequests({ axios: axios });
+await axios.get('https://api.example.com/users');
+
+// Custom axios instances also work
+const apiClient = axios.create({ baseURL: 'https://api.example.com' });
+logRequests({ axios: apiClient });
+await apiClient.get('/users');
+```

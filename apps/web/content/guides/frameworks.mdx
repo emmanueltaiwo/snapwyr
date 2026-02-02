@@ -1,0 +1,256 @@
+---
+title: Framework Middleware
+description: Use Snapwyr middleware with Express, Next.js, Koa, Fastify, NestJS, and Hono
+---
+
+# Framework Middleware
+
+Snapwyr provides middleware for popular Node.js frameworks to log incoming requests.
+
+## Express
+
+```javascript
+import express from 'express';
+import { snapwyr } from 'snapwyr/express';
+import { serve } from 'snapwyr/dashboard';
+
+const app = express();
+
+app.use(
+  snapwyr({
+    logBody: true,
+    requestId: true,
+    redact: ['password', 'token'],
+  })
+);
+
+serve(3333); // Dashboard at localhost:3333
+
+app.get('/api/users', (req, res) => {
+  res.json({ users: [] });
+});
+
+app.listen(3000);
+```
+
+## Fastify
+
+```javascript
+import Fastify from 'fastify';
+import { snapwyr } from 'snapwyr/fastify';
+import { serve } from 'snapwyr/dashboard';
+
+const fastify = Fastify();
+
+fastify.register(snapwyr, {
+  logBody: true,
+  requestId: true,
+});
+
+serve(3333);
+
+fastify.get('/api/users', async () => {
+  return { users: [] };
+});
+
+fastify.listen({ port: 3000 });
+```
+
+## Koa
+
+```javascript
+import Koa from 'koa';
+import { snapwyr } from 'snapwyr/koa';
+import { serve } from 'snapwyr/dashboard';
+
+const app = new Koa();
+
+app.use(
+  snapwyr({
+    logBody: true,
+    requestId: true,
+  })
+);
+
+serve(3333);
+
+app.use(async (ctx) => {
+  ctx.body = { message: 'Hello' };
+});
+
+app.listen(3000);
+```
+
+## Hono
+
+```typescript
+import { Hono } from 'hono';
+import { snapwyr } from 'snapwyr/hono';
+import { serve } from 'snapwyr/dashboard';
+
+const app = new Hono();
+
+app.use(
+  '*',
+  snapwyr({
+    logBody: true,
+    requestId: true,
+  })
+);
+
+serve(3333);
+
+app.get('/api/users', (c) => c.json({ users: [] }));
+
+export default app;
+```
+
+## NestJS
+
+```typescript
+import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { SnapwyrInterceptor } from 'snapwyr/nestjs';
+
+@Module({
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useValue: SnapwyrInterceptor({
+        logBody: true,
+        requestId: true,
+      }),
+    },
+  ],
+})
+export class AppModule {}
+```
+
+Start dashboard in `main.ts`:
+
+```typescript
+import { serve } from 'snapwyr/dashboard';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  serve(3333);
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+## Next.js
+
+Create `proxy.ts` in your project root (same level as `app` folder):
+
+```typescript
+// proxy.ts
+import { snapwyr } from 'snapwyr/nextjs';
+
+export const proxy = snapwyr({ logBody: true });
+
+export const config = {
+  matcher: '/api/:path*',
+};
+```
+
+Note: The dashboard is designed for Node.js servers. In Next.js, use Express or Fastify for API routes if you need the dashboard.
+
+```typescript
+// For dashboard support, use Express-based API routes
+import { snapwyr } from 'snapwyr/express';
+import { serve } from 'snapwyr/dashboard';
+```
+
+## Configuration Options
+
+All middleware accepts these options:
+
+```typescript
+{
+  // Output
+  format?: 'pretty' | 'json';
+  prefix?: string;
+  silent?: boolean;
+
+  // Body
+  logBody?: boolean;
+  bodySizeLimit?: number;
+
+  // Filtering
+  ignorePatterns?: (string | RegExp)[];
+  methods?: string[];
+  statusCodes?: number[];
+  errorsOnly?: boolean;
+
+  // Features
+  requestId?: boolean;
+  sizeTracking?: boolean;
+  slowThreshold?: number;
+  redact?: (string | RegExp)[];
+
+  // Advanced
+  transport?: (entry: LogEntry) => void;
+}
+```
+
+## Full Example
+
+```javascript
+import express from 'express';
+import { snapwyr } from 'snapwyr/express';
+import { logRequests } from 'snapwyr';
+import { serve } from 'snapwyr/dashboard';
+
+const app = express();
+
+// Log incoming requests
+app.use(
+  snapwyr({
+    logBody: true,
+    requestId: true,
+    sizeTracking: true,
+    slowThreshold: 500,
+    redact: ['password', 'token', 'apiKey'],
+    ignorePatterns: ['/health', '/metrics'],
+  })
+);
+
+// Log outgoing requests
+logRequests({
+  logBody: true,
+});
+
+// To log axios requests, pass your axios instance
+import axios from 'axios';
+logRequests({
+  axios: axios, // Required for axios interception
+  logBody: true,
+});
+
+// Start dashboard
+serve(3333);
+
+app.post('/api/login', (req, res) => {
+  // Password is redacted in logs
+  res.json({ token: 'xxx' });
+});
+
+app.get('/api/data', async (req, res) => {
+  // This outgoing call is also logged
+  const data = await fetch('https://api.example.com/data');
+  res.json(await data.json());
+});
+
+app.listen(3000);
+```
+
+Console output:
+
+```
+[m2x9k] POST   201  89ms  1.2KB  /api/login
+[m2x9l] GET    200  234ms 4.5KB  /api/data
+        GET    200  180ms        https://api.example.com/data
+```
+
+Dashboard shows both incoming and outgoing requests with direction indicators.

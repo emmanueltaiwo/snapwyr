@@ -1,0 +1,319 @@
+---
+title: Configuration
+description: Configure Snapwyr to match your needs
+---
+
+# Configuration
+
+Snapwyr accepts an optional configuration object to customize its behavior.
+
+## All Options
+
+```typescript
+interface SnapWyrConfig {
+  // Output
+  format?: 'pretty' | 'json'; // Log format (default: 'pretty')
+  emoji?: boolean; // Show emoji indicators
+  silent?: boolean; // Disable console output
+  prefix?: string; // Prefix for log lines
+  showTimestamp?: boolean; // Show timestamps (default: true)
+
+  // Body logging
+  logBody?: boolean; // Log request/response bodies
+  bodySizeLimit?: number; // Max body size in bytes (default: 10KB)
+
+  // Filtering
+  errorsOnly?: boolean; // Only log 4xx/5xx responses
+  methods?: string[]; // Only log these HTTP methods
+  statusCodes?: number[]; // Only log these status codes
+  ignorePatterns?: (string | RegExp)[]; // URLs to ignore
+
+  // Features
+  slowThreshold?: number; // Mark slow requests (ms, default: 1000)
+  requestId?: boolean; // Generate X-Request-ID headers
+  sizeTracking?: boolean; // Track request/response sizes
+  redact?: (string | RegExp)[]; // Patterns to redact from bodies
+
+  // HTTP Clients (for logRequests only)
+  axios?: any; // Axios instance to intercept (required for axios logging)
+
+  // Advanced
+  transport?: (entry: LogEntry) => void; // Custom log handler
+  enabled?: boolean; // Enable/disable logging
+}
+```
+
+## Output Options
+
+### format
+
+Choose between pretty console output or JSON.
+
+```javascript
+// Pretty output (default)
+snapwyr({ format: 'pretty' });
+// Output: GET    200  45ms  /api/users
+
+// JSON output
+snapwyr({ format: 'json' });
+// Output: {"method":"GET","status":200,"duration":45,"url":"/api/users"}
+```
+
+### prefix
+
+Add a prefix to all log lines.
+
+```javascript
+snapwyr({ prefix: '[API]' });
+// Output: [API] GET 200 45ms /api/users
+```
+
+### silent
+
+Disable console output (useful when using transport only).
+
+```javascript
+snapwyr({
+  silent: true,
+  transport: (entry) => sendToExternalService(entry),
+});
+```
+
+## Body Logging
+
+### logBody
+
+Enable logging of request and response bodies.
+
+```javascript
+snapwyr({ logBody: true });
+```
+
+### bodySizeLimit
+
+Limit body size to prevent large payloads from flooding logs.
+
+```javascript
+snapwyr({
+  logBody: true,
+  bodySizeLimit: 5000, // 5KB max
+});
+```
+
+## Filtering
+
+### errorsOnly
+
+Only log failed requests (4xx/5xx status codes).
+
+```javascript
+snapwyr({ errorsOnly: true });
+```
+
+### methods
+
+Only log specific HTTP methods.
+
+```javascript
+snapwyr({
+  methods: ['POST', 'PUT', 'DELETE'], // Only mutations
+});
+```
+
+### statusCodes
+
+Only log specific status codes.
+
+```javascript
+snapwyr({
+  statusCodes: [500, 502, 503, 504], // Only server errors
+});
+```
+
+### ignorePatterns
+
+Ignore specific URLs or patterns.
+
+```javascript
+snapwyr({
+  ignorePatterns: ['/health', '/metrics', /^\/_next/, /\.(jpg|png|css|js)$/],
+});
+```
+
+## Features
+
+### slowThreshold
+
+Mark requests slower than a threshold (in milliseconds).
+
+```javascript
+snapwyr({
+  slowThreshold: 500, // Mark requests > 500ms as slow
+});
+```
+
+Slow requests are highlighted in console output and marked in the dashboard.
+
+### requestId
+
+Generate unique request IDs.
+
+```javascript
+snapwyr({ requestId: true });
+```
+
+This adds an `X-Request-ID` header to responses and includes the ID in logs:
+
+```
+[m2x9k-a3b] GET 200 45ms /api/users
+```
+
+### sizeTracking
+
+Track request and response sizes.
+
+```javascript
+snapwyr({ sizeTracking: true });
+```
+
+Output includes size information:
+
+```
+GET 200 45ms 2.4KB /api/users
+```
+
+### redact
+
+Redact sensitive data from logged bodies.
+
+```javascript
+snapwyr({
+  logBody: true,
+  redact: [
+    'password',
+    'token',
+    'secret',
+    'apiKey',
+    /api[_-]?key/i,
+    /authorization/i,
+  ],
+});
+```
+
+Matching fields are replaced with `[REDACTED]`:
+
+```json
+{ "password": "[REDACTED]", "email": "user@example.com" }
+```
+
+## Advanced
+
+### transport
+
+Custom log handler for sending logs to external services.
+
+```javascript
+snapwyr({
+  transport: (entry) => {
+    // Send to logging service
+    fetch('https://logs.example.com', {
+      method: 'POST',
+      body: JSON.stringify(entry),
+    });
+  },
+});
+```
+
+The `entry` object contains:
+
+```typescript
+interface LogEntry {
+  id: string;
+  timestamp: string;
+  method: string;
+  url: string;
+  status: number | undefined;
+  duration: number;
+  slow: boolean;
+  error?: string;
+  requestBody?: string;
+  responseBody?: string;
+  requestSize?: number;
+  responseSize?: number;
+  totalSize?: number;
+  direction?: 'incoming' | 'outgoing';
+}
+```
+
+### enabled
+
+Explicitly enable or disable logging.
+
+```javascript
+snapwyr({
+  enabled: process.env.DEBUG === 'true',
+});
+```
+
+## Complete Example
+
+### Middleware Configuration
+
+```javascript
+import { snapwyr } from 'snapwyr/express';
+import { serve } from 'snapwyr/dashboard';
+
+app.use(
+  snapwyr({
+    // Output
+    format: 'pretty',
+    prefix: '[API]',
+    showTimestamp: true,
+
+    // Body logging
+    logBody: true,
+    bodySizeLimit: 10000,
+
+    // Filtering
+    ignorePatterns: ['/health', '/metrics'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+
+    // Features
+    slowThreshold: 1000,
+    requestId: true,
+    sizeTracking: true,
+    redact: ['password', 'token', /secret/i],
+
+    // Send to external service
+    transport: (entry) => {
+      if (entry.error || entry.slow) {
+        alertService.notify(entry);
+      }
+    },
+  })
+);
+
+// Start dashboard
+serve(3333);
+```
+
+### Outgoing Requests Configuration
+
+```javascript
+import { logRequests } from 'snapwyr';
+import axios from 'axios';
+
+// Log fetch requests (automatic)
+logRequests({
+  logBody: true,
+  format: 'pretty',
+});
+
+// Log axios requests (requires passing instance)
+logRequests({
+  axios: axios, // Required for axios interception
+  logBody: true,
+  format: 'pretty',
+  slowThreshold: 500,
+});
+```

@@ -1,0 +1,114 @@
+---
+title: Installation
+description: Install Snapwyr in your Node.js project
+---
+
+# Installation
+
+## Requirements
+
+- Node.js >= 18
+
+## Install
+
+```bash
+npm install snapwyr
+```
+
+## Quick Start
+
+### 1. Add Middleware
+
+Log incoming requests to your server:
+
+```javascript
+import express from 'express';
+import { snapwyr } from 'snapwyr/express';
+
+const app = express();
+app.use(snapwyr({ logBody: true }));
+```
+
+### 2. Start the Dashboard
+
+View requests in your browser:
+
+```javascript
+import { serve } from 'snapwyr/dashboard';
+
+serve(3333); // http://localhost:3333
+```
+
+### 3. Log Outgoing Requests (Optional)
+
+Log requests your app makes to external APIs:
+
+```javascript
+import { logRequests } from 'snapwyr';
+
+// Log fetch requests (automatic)
+logRequests({ logBody: true });
+
+// To log axios requests, pass your axios instance
+import axios from 'axios';
+logRequests({
+  axios: axios, // Required for axios interception
+  logBody: true,
+});
+```
+
+## Complete Example
+
+```javascript
+import express from 'express';
+import { snapwyr } from 'snapwyr/express';
+import { logRequests } from 'snapwyr';
+import { serve } from 'snapwyr/dashboard';
+
+const app = express();
+
+// Log incoming requests
+app.use(snapwyr({ logBody: true }));
+
+// Log outgoing requests
+logRequests({ logBody: true });
+
+// To log axios requests, pass your axios instance
+import axios from 'axios';
+logRequests({
+  axios: axios, // Required for axios interception
+  logBody: true,
+});
+
+// Start dashboard
+serve(3333);
+
+app.get('/api/users', (req, res) => {
+  res.json([{ id: 1, name: 'John' }]);
+});
+
+app.listen(3000, () => {
+  console.log('Server: http://localhost:3000');
+  console.log('Dashboard: http://localhost:3333');
+});
+```
+
+## Console Output
+
+```
+12:34:56 GET    200  45ms   /api/users
+12:34:57 POST   201  89ms   /api/users
+```
+
+## Framework Support
+
+| Framework | Import            |
+| --------- | ----------------- |
+| Express   | `snapwyr/express` |
+| Fastify   | `snapwyr/fastify` |
+| Koa       | `snapwyr/koa`     |
+| Hono      | `snapwyr/hono`    |
+| NestJS    | `snapwyr/nestjs`  |
+| Next.js   | `snapwyr/nextjs`  |
+
+See the [Framework Middleware](/docs/guides/frameworks) guide for examples.

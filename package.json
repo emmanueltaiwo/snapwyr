@@ -1,6 +1,18 @@
 {
   "name": "snapwyr",
+  "version": "1.0.0",
   "private": true,
+  "description": "Snapwyr turborepo - Zero-config HTTP request logger for Node.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emmanueltaiwo/snapwyr.git"
+  },
+  "bugs": {
+    "url": "https://github.com/emmanueltaiwo/snapwyr/issues"
+  },
+  "homepage": "https://github.com/emmanueltaiwo/snapwyr#readme",
+  "license": "AGPL-3.0",
+  "author": "emmanueltaiwo",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",

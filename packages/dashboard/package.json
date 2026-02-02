@@ -1,0 +1,69 @@
+{
+  "name": "@snapwyr/dashboard",
+  "version": "1.0.0",
+  "description": "Real-time web dashboard for Snapwyr HTTP request logging",
+  "type": "module",
+  "main": "./dist/server/index.js",
+  "types": "./dist/server/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/server/index.js",
+      "types": "./dist/server/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "dev:server": "tsx watch server/index.ts",
+    "build:ui": "vite build",
+    "build:embed": "tsx scripts/embed-html.ts",
+    "build:server": "tsc -p tsconfig.server.json",
+    "build": "npm run build:ui && npm run build:embed && npm run build:server",
+    "preview": "vite preview",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "dashboard",
+    "http",
+    "logging",
+    "real-time",
+    "websocket",
+    "snapwyr"
+  ],
+  "dependencies": {
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@types/ws": "^8.5.10",
+    "@vitejs/plugin-react": "^4.2.1",
+    "@tailwindcss/vite": "^4.0.0",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^4.0.0",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10",
+    "vite-plugin-singlefile": "^0.13.5"
+  },
+  "peerDependencies": {
+    "@snapwyr/core": "^1.0.0"
+  },
+  "author": "emmanueltaiwo",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emmanueltaiwo/snapwyr.git",
+    "directory": "packages/dashboard"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

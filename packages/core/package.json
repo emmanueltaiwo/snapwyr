@@ -1,0 +1,71 @@
+{
+  "name": "@snapwyr/core",
+  "version": "1.0.0",
+  "description": "Core HTTP interception and event system for Snapwyr",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./emitter": {
+      "types": "./dist/emitter.d.ts",
+      "import": "./dist/emitter.mjs",
+      "require": "./dist/emitter.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/index.d.ts"
+      ],
+      "emitter": [
+        "./dist/emitter.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "http",
+    "interceptor",
+    "fetch",
+    "axios",
+    "logging",
+    "snapwyr"
+  ],
+  "author": "emmanueltaiwo",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emmanueltaiwo/snapwyr.git",
+    "directory": "packages/core"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/node": "^22.15.3",
+    "eslint": "^9.39.1",
+    "tsup": "^8.5.1",
+    "typescript": "5.9.2"
+  },
+  "dependencies": {
+    "events": "^1.0.0"
+  }
+}

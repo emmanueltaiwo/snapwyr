@@ -1,0 +1,194 @@
+---
+title: Dashboard
+description: Real-time web dashboard for viewing HTTP requests
+---
+
+# Dashboard
+
+Snapwyr includes a real-time web dashboard for viewing all HTTP requests in your browser.
+
+## Quick Start
+
+```javascript
+import express from 'express';
+import { snapwyr } from 'snapwyr/express';
+import { serve } from 'snapwyr/dashboard';
+
+const app = express();
+
+// Log incoming requests
+app.use(snapwyr({ logBody: true }));
+
+// Start dashboard on port 3333
+serve(3333);
+
+app.listen(3000);
+```
+
+Open http://localhost:3333 to view the dashboard.
+
+## Features
+
+### Live Updates
+
+The dashboard uses WebSockets to show requests in real-time. No need to refresh.
+
+### Filtering
+
+Filter requests by:
+
+- **Direction** - Incoming (to your server) or outgoing (to external APIs)
+- **Method** - GET, POST, PUT, PATCH, DELETE
+- **Status** - 2xx, 3xx, 4xx, 5xx
+- **Errors** - Show only failed requests
+- **Slow** - Show only slow requests
+
+### Search
+
+Search requests by URL or body content.
+
+### Request Details
+
+Click any request to see:
+
+- Full URL
+- Timestamp
+- Duration
+- Request/response sizes
+- Request body (if enabled)
+- Response body (if enabled)
+- Error message (if any)
+
+### cURL Export
+
+Copy any request as a cURL command for easy debugging and replay.
+
+## Configuration
+
+```javascript
+import { serve } from 'snapwyr/dashboard';
+
+serve(3333, {
+  host: 'localhost', // Bind address (default: 'localhost')
+  open: true, // Auto-open browser (default: false)
+  maxRequests: 1000, // Max requests to store (default: 1000)
+});
+```
+
+## API
+
+### serve(port, options?)
+
+Start the dashboard server.
+
+```javascript
+import { serve } from 'snapwyr/dashboard';
+
+serve(3333);
+```
+
+### stop()
+
+Stop the dashboard server.
+
+```javascript
+import { stop } from 'snapwyr/dashboard';
+
+stop();
+```
+
+### pushRequest(entry)
+
+Manually push a request to the dashboard.
+
+```javascript
+import { pushRequest } from 'snapwyr/dashboard';
+
+pushRequest({
+  id: 'unique-id',
+  timestamp: new Date().toISOString(),
+  method: 'GET',
+  url: '/api/users',
+  status: 200,
+  duration: 45,
+  slow: false,
+  direction: 'incoming',
+});
+```
+
+## Incoming vs Outgoing
+
+The dashboard shows both types of requests:
+
+- **Incoming** (blue arrow) - Requests hitting your server via middleware
+- **Outgoing** (purple arrow) - Requests your app makes to external APIs
+
+### Log Both
+
+```javascript
+import express from 'express';
+import { snapwyr } from 'snapwyr/express';
+import { logRequests } from 'snapwyr';
+import { serve } from 'snapwyr/dashboard';
+
+const app = express();
+
+// Log incoming requests (middleware)
+app.use(snapwyr({ logBody: true }));
+
+// Log outgoing requests (interceptors)
+logRequests({ logBody: true });
+
+// To log axios requests, pass your axios instance
+import axios from 'axios';
+logRequests({
+  axios: axios, // Required for axios interception
+  logBody: true,
+});
+
+// Dashboard shows both
+serve(3333);
+```
+
+## Data Persistence
+
+The dashboard stores requests in memory. When your server restarts, data is cleared.
+
+This is intentional for a development tool:
+
+- No disk I/O overhead
+- No cleanup needed
+- Fresh state on each dev session
+- Privacy (nothing persisted to disk)
+
+## Tips
+
+### Use with nodemon
+
+The dashboard runs in the same process as your server. With nodemon, it restarts when files change.
+
+To reduce restarts, use nodemon's delay option:
+
+```json
+{
+  "watch": ["src"],
+  "delay": "2000"
+}
+```
+
+### External Logging
+
+Use the `transport` option to send logs to external services while keeping the dashboard:
+
+```javascript
+snapwyr({
+  logBody: true,
+  transport: (entry) => {
+    // Send to external service
+    fetch('https://logs.example.com', {
+      method: 'POST',
+      body: JSON.stringify(entry),
+    });
+  },
+});
+```

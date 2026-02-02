@@ -1,50 +1,244 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #000000;
+  --foreground: #00ff00;
+
+  /* Fumadocs official CSS variables */
+  --fd-sidebar-width: 240px;
+  --fd-nav-height: 80px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 body {
-  color: var(--foreground);
   background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Terminal effects only on home page */
+.home-page {
+  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
 }
 
 * {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+  scroll-behavior: smooth;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+/* Terminal cursor effect */
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
-.imgDark {
-  display: none;
+.terminal-cursor::after {
+  content: '_';
+  animation: blink 1s infinite;
+  color: #00ff00;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+/* Terminal scanline effect */
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
   }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
 
-  .imgLight {
-    display: none;
+.screen-glitch {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  pointer-events: none;
+  z-index: 9999;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 255, 0, 0.4) 50%,
+    transparent 100%
+  );
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  animation: scanline 3s linear infinite;
+}
+
+/* Terminal noise/static effect */
+@keyframes terminalNoise {
+  0%,
+  100% {
+    opacity: 0;
   }
-  .imgDark {
-    display: unset;
+  50% {
+    opacity: 0.03;
   }
+}
+
+.terminal-noise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9997;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 0, 0.03) 2px,
+      rgba(0, 255, 0, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 0, 0.03) 2px,
+      rgba(0, 255, 0, 0.03) 4px
+    );
+  animation: terminalNoise 0.1s infinite;
+}
+
+/* Subtle screen flicker - only on home page */
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.98;
+  }
+}
+
+.home-page-flicker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 255, 0, 0.02);
+  pointer-events: none;
+  z-index: 9998;
+  animation: flicker 0.15s infinite;
+}
+
+/* Enhanced Fumadocs sidebar styling */
+aside[data-sidebar],
+.fd-sidebar,
+[data-sidebar],
+nav[data-sidebar],
+aside {
+  background: #000000 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Sidebar width control */
+aside[data-sidebar],
+.fd-sidebar,
+[data-sidebar] {
+  width: var(--fd-sidebar-width) !important;
+  min-width: var(--fd-sidebar-width) !important;
+  max-width: var(--fd-sidebar-width) !important;
+}
+
+/* Sidebar links */
+aside[data-sidebar] a,
+.fd-sidebar a,
+[data-sidebar] a {
+  color: rgba(255, 255, 255, 0.7) !important;
+  transition: all 0.2s ease;
+}
+
+aside[data-sidebar] a:hover,
+.fd-sidebar a:hover,
+[data-sidebar] a:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Active sidebar item */
+aside[data-sidebar] a[data-active='true'],
+.fd-sidebar a[data-active='true'],
+[data-sidebar] a[data-active='true'],
+aside[data-sidebar] [data-active='true'],
+.fd-sidebar [data-active='true'],
+[data-sidebar] [data-active='true'] {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  font-weight: 500;
+}
+
+/* Sidebar folders */
+aside[data-sidebar] [data-folder],
+.fd-sidebar [data-folder],
+[data-sidebar] [data-folder] {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+aside[data-sidebar] [data-folder] > button,
+.fd-sidebar [data-folder] > button,
+[data-sidebar] [data-folder] > button {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 600;
+}
+
+aside[data-sidebar] [data-folder][data-active='true'] > button,
+.fd-sidebar [data-folder][data-active='true'] > button,
+[data-sidebar] [data-folder][data-active='true'] > button {
+  color: #ffffff !important;
+}
+
+/* Sidebar scrollbar */
+aside[data-sidebar]::-webkit-scrollbar,
+.fd-sidebar::-webkit-scrollbar,
+[data-sidebar]::-webkit-scrollbar {
+  width: 8px;
+}
+
+aside[data-sidebar]::-webkit-scrollbar-track,
+.fd-sidebar::-webkit-scrollbar-track,
+[data-sidebar]::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+aside[data-sidebar]::-webkit-scrollbar-thumb,
+.fd-sidebar::-webkit-scrollbar-thumb,
+[data-sidebar]::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+aside[data-sidebar]::-webkit-scrollbar-thumb:hover,
+.fd-sidebar::-webkit-scrollbar-thumb:hover,
+[data-sidebar]::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme-toggle],
+.theme-toggle {
+  display: none !important;
 }

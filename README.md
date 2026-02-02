@@ -1,135 +1,165 @@
-# Turborepo starter
+# Snapwyr
 
-This Turborepo starter is maintained by the Turborepo core team.
+Zero-config HTTP request logger for Node.js with a real-time web dashboard.
 
-## Using this example
+## What It Does
 
-Run the following command:
+Snapwyr logs HTTP requests in your Node.js application:
 
-```sh
-npx create-turbo@latest
+- **Incoming requests** - Requests hitting your server (via middleware)
+- **Outgoing requests** - HTTP calls your app makes (fetch, axios)
+
+All requests appear in your console and optionally in a real-time web dashboard.
+
+## Installation
+
+```bash
+npm install snapwyr
 ```
 
-## What's inside?
+## Quick Start
 
-This Turborepo includes the following packages/apps:
+### 1. Add Middleware (Incoming Requests)
 
-### Apps and Packages
+```javascript
+import express from 'express';
+import { snapwyr } from 'snapwyr/express';
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+const app = express();
+app.use(snapwyr());
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### 2. Log Outgoing Requests
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+```javascript
+import { logRequests } from 'snapwyr';
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+// Log fetch requests (automatic)
+logRequests();
 
-### Develop
+await fetch('https://api.example.com/users');
 
-To develop all apps and packages, run the following command:
+// To log axios requests, pass your axios instance
+import axios from 'axios';
+logRequests({ axios: axios });
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+await axios.get('https://api.example.com/users');
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+### 3. Open the Dashboard
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+```javascript
+import { serve } from 'snapwyr/dashboard';
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+serve(3333); // Open http://localhost:3333
 ```
 
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+## Console Output
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+GET    200  45ms   /api/users
+POST   201  123ms  /api/users
+GET    404  12ms   /api/unknown
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## Dashboard
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+The dashboard provides a real-time web UI showing all requests:
 
+- Live WebSocket updates
+- Filter by method, status, direction (incoming/outgoing)
+- Search requests
+- View request/response bodies
+- Copy as cURL
+- Error and slow request highlighting
+
+```javascript
+import { snapwyr } from 'snapwyr/express';
+import { serve } from 'snapwyr/dashboard';
+
+app.use(snapwyr({ logBody: true }));
+serve(3333);
 ```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+## Framework Support
+
+| Framework | Import            | Usage                       |
+| --------- | ----------------- | --------------------------- |
+| Express   | `snapwyr/express` | `app.use(snapwyr())`        |
+| Fastify   | `snapwyr/fastify` | `fastify.register(snapwyr)` |
+| Koa       | `snapwyr/koa`     | `app.use(snapwyr())`        |
+| Hono      | `snapwyr/hono`    | `app.use('*', snapwyr())`   |
+| NestJS    | `snapwyr/nestjs`  | `SnapwyrInterceptor()`      |
+| Next.js   | `snapwyr/nextjs`  | `snapwyr()`                 |
+
+## Configuration
+
+```typescript
+import axios from 'axios';
+
+// For middleware (incoming requests)
+snapwyr({
+  logBody: true, // Log request/response bodies
+  bodySizeLimit: 10000, // Max body size in bytes
+  format: 'pretty', // 'pretty' or 'json'
+  emoji: false, // Add emoji indicators
+  silent: false, // Disable console output
+  prefix: '[API]', // Prefix for log lines
+  slowThreshold: 1000, // Mark requests slower than this (ms)
+  errorsOnly: false, // Only log 4xx/5xx responses
+  methods: ['GET', 'POST'], // Only log these methods
+  ignorePatterns: ['/health'], // URLs to ignore
+  redact: ['password', /token/i], // Redact sensitive fields
+  requestId: true, // Generate request IDs
+  sizeTracking: true, // Track request/response sizes
+  statusCodes: [200, 201], // Only log these status codes
+  transport: (entry) => {}, // Custom log handler
+});
+
+// For outgoing requests (logRequests)
+logRequests({
+  axios: axios, // Required to log axios requests
+  logBody: true,
+  format: 'pretty',
+  // ... other options
+});
 ```
 
-## Useful Links
+## Features
 
-Learn more about the power of Turborepo:
+- **Zero-config** - Works out of the box
+- **Real-time dashboard** - Web UI with live updates
+- **Multiple frameworks** - Express, Fastify, Koa, Hono, NestJS, Next.js
+- **Sensitive data redaction** - Hide passwords, tokens, etc.
+- **Request IDs** - Track requests across logs
+- **Size tracking** - See request/response sizes
+- **cURL export** - Copy requests as cURL commands
+- **Direction indicator** - Distinguish incoming vs outgoing requests
+- **Production safe** - Automatically disabled when `NODE_ENV=production`
 
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+## Project Structure
+
+This monorepo contains:
+
+- `packages/sdk` - Main package published as `snapwyr`
+- `packages/core` - Core interception logic (`@snapwyr/core`)
+- `packages/dashboard` - Real-time web dashboard (`@snapwyr/dashboard`)
+
+## Development
+
+```bash
+npm install
+npm run build
+```
+
+## Requirements
+
+- Node.js >= 18
+
+## License
+
+AGPL-3.0
+
+## Author
+
+[emmanueltaiwo](https://github.com/emmanueltaiwo)

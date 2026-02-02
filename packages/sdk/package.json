@@ -1,0 +1,174 @@
+{
+  "name": "snapwyr",
+  "version": "1.0.0",
+  "description": "Zero-config HTTP request logger for Node.js. Automatically intercepts and logs fetch and axios requests. Perfect for debugging API calls in development.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./express": {
+      "types": "./dist/express.d.ts",
+      "import": "./dist/express.mjs",
+      "require": "./dist/express.js"
+    },
+    "./nextjs": {
+      "types": "./dist/nextjs.d.ts",
+      "import": "./dist/nextjs.mjs",
+      "require": "./dist/nextjs.js"
+    },
+    "./fastify": {
+      "types": "./dist/fastify.d.ts",
+      "import": "./dist/fastify.mjs",
+      "require": "./dist/fastify.js"
+    },
+    "./koa": {
+      "types": "./dist/koa.d.ts",
+      "import": "./dist/koa.mjs",
+      "require": "./dist/koa.js"
+    },
+    "./nestjs": {
+      "types": "./dist/nestjs.d.ts",
+      "import": "./dist/nestjs.mjs",
+      "require": "./dist/nestjs.js"
+    },
+    "./hono": {
+      "types": "./dist/hono.d.ts",
+      "import": "./dist/hono.mjs",
+      "require": "./dist/hono.js"
+    },
+    "./dashboard": {
+      "types": "./dist/dashboard.d.ts",
+      "import": "./dist/dashboard.mjs",
+      "require": "./dist/dashboard.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/index.d.ts"
+      ],
+      "express": [
+        "./dist/express.d.ts"
+      ],
+      "nextjs": [
+        "./dist/nextjs.d.ts"
+      ],
+      "fastify": [
+        "./dist/fastify.d.ts"
+      ],
+      "koa": [
+        "./dist/koa.d.ts"
+      ],
+      "nestjs": [
+        "./dist/nestjs.d.ts"
+      ],
+      "hono": [
+        "./dist/hono.d.ts"
+      ],
+      "dashboard": [
+        "./dist/dashboard.d.ts"
+      ]
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "http",
+    "request",
+    "logger",
+    "debugging",
+    "fetch",
+    "axios",
+    "interceptor",
+    "monitoring",
+    "dev-tools",
+    "api",
+    "debug",
+    "logging",
+    "express",
+    "fastify",
+    "koa",
+    "hono",
+    "nestjs",
+    "nextjs",
+    "middleware",
+    "dashboard",
+    "real-time",
+    "websocket"
+  ],
+  "author": "emmanueltaiwo",
+  "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emmanueltaiwo/snapwyr.git",
+    "directory": "packages/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/emmanueltaiwo/snapwyr/issues"
+  },
+  "homepage": "https://github.com/emmanueltaiwo/snapwyr#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/node": "^22.15.3",
+    "eslint": "^9.39.1",
+    "rxjs": "^7.8.2",
+    "tsup": "^8.5.1",
+    "typescript": "5.9.2"
+  },
+  "peerDependencies": {
+    "@nestjs/common": ">=9.0.0",
+    "express": ">=4.0.0",
+    "fastify": ">=4.0.0",
+    "hono": ">=4.0.0",
+    "koa": ">=2.0.0",
+    "next": ">=13.0.0",
+    "rxjs": ">=7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    },
+    "fastify": {
+      "optional": true
+    },
+    "koa": {
+      "optional": true
+    },
+    "hono": {
+      "optional": true
+    },
+    "@nestjs/common": {
+      "optional": true
+    },
+    "rxjs": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@snapwyr/core": "^1.0.0",
+    "@snapwyr/dashboard": "^1.0.0"
+  }
+}

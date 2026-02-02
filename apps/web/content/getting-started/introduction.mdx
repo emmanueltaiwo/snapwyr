@@ -1,0 +1,121 @@
+---
+title: Introduction
+description: Learn what Snapwyr is and why you should use it
+---
+
+# Introduction
+
+Snapwyr is a **zero-config HTTP request logger** for Node.js with a **real-time web dashboard**. Log incoming and outgoing HTTP requests with beautiful console output and a live web UI.
+
+## What is Snapwyr?
+
+Snapwyr provides:
+
+- **Middleware** for logging incoming requests (Express, Fastify, Koa, Hono, NestJS, Next.js)
+- **Interceptors** for logging outgoing requests (fetch, axios - requires passing axios instance)
+- **Real-time dashboard** for viewing requests in your browser
+
+## Quick Start
+
+```javascript
+import express from 'express';
+import { snapwyr } from 'snapwyr/express';
+import { serve } from 'snapwyr/dashboard';
+
+const app = express();
+
+// Log all incoming requests
+app.use(snapwyr({ logBody: true }));
+
+// Start the dashboard
+serve(3333);
+
+app.listen(3000);
+```
+
+Open http://localhost:3333 to see the dashboard.
+
+## Features
+
+### Real-time Dashboard
+
+A web UI that shows all requests in real-time:
+
+- Live WebSocket updates
+- Filter by method, status, direction
+- Search by URL or body content
+- View request/response bodies
+- Copy requests as cURL commands
+
+### Console Logging
+
+Color-coded console output:
+
+```
+12:34:56 GET    200  45ms   /api/users
+12:34:57 POST   201  89ms   /api/users
+12:34:58 GET    404  12ms   /api/unknown
+```
+
+### Incoming and Outgoing
+
+Log both directions:
+
+- **Incoming** - Requests hitting your server (via middleware)
+- **Outgoing** - Requests your app makes to external APIs (via interceptors)
+
+### Sensitive Data Redaction
+
+Automatically redact passwords, tokens, and API keys:
+
+```javascript
+snapwyr({
+  logBody: true,
+  redact: ['password', 'token', /api[_-]?key/i],
+});
+```
+
+### Request IDs
+
+Generate unique IDs for tracking requests:
+
+```javascript
+snapwyr({
+  requestId: true, // Adds X-Request-ID header
+});
+```
+
+### Size Tracking
+
+See request and response sizes:
+
+```javascript
+snapwyr({
+  sizeTracking: true,
+});
+```
+
+### cURL Export
+
+Copy any request as a cURL command from the dashboard for easy debugging.
+
+## Framework Support
+
+| Framework | Import            | Usage                       |
+| --------- | ----------------- | --------------------------- |
+| Express   | `snapwyr/express` | `app.use(snapwyr())`        |
+| Fastify   | `snapwyr/fastify` | `fastify.register(snapwyr)` |
+| Koa       | `snapwyr/koa`     | `app.use(snapwyr())`        |
+| Hono      | `snapwyr/hono`    | `app.use('*', snapwyr())`   |
+| NestJS    | `snapwyr/nestjs`  | `SnapwyrInterceptor()`      |
+| Next.js   | `snapwyr/nextjs`  | `snapwyr()`                 |
+
+## Production Safety
+
+Snapwyr automatically disables itself when `NODE_ENV === 'production'`:
+
+```javascript
+// In development: logs requests
+// In production: does nothing
+snapwyr();
+```
