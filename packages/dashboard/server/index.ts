@@ -131,30 +131,24 @@ export function serve(config: DashboardConfig | number = {}): void {
 
   dashboardServer.listen(port, host, () => {
     const url = `http://${host}:${port}`;
-    console.log('');
-    console.log(
-      '\x1b[38;5;208m┌─────────────────────────────────────────┐\x1b[0m'
-    );
-    console.log(
-      '\x1b[38;5;208m│\x1b[0m  🔥 \x1b[1mSnapwyr Dashboard\x1b[0m                    \x1b[38;5;208m│\x1b[0m'
-    );
-    console.log(
-      '\x1b[38;5;208m│\x1b[0m                                         \x1b[38;5;208m│\x1b[0m'
-    );
-    console.log(
-      `\x1b[38;5;208m│\x1b[0m  \x1b[2mLocal:\x1b[0m   \x1b[36m${url.padEnd(27)}\x1b[0m\x1b[38;5;208m│\x1b[0m`
-    );
-    console.log(
-      '\x1b[38;5;208m│\x1b[0m                                         \x1b[38;5;208m│\x1b[0m'
-    );
-    console.log(
-      '\x1b[38;5;208m└─────────────────────────────────────────┘\x1b[0m'
-    );
-    console.log('');
 
-    if (options.open) {
-      openBrowser(url);
-    }
+    const orange = '\x1b[38;5;208m';
+    const cyan = '\x1b[36m';
+    const bold = '\x1b[1m';
+    const dim = '\x1b[2m';
+    const reset = '\x1b[0m';
+
+    console.log(`
+${orange}╭────────────────────────────────────────────╮${reset}
+${orange}│${reset}  🔥 ${bold}Snapwyr Dashboard${reset}
+${orange}│${reset}
+${orange}│${reset}  ${dim}Status:${reset}   ${cyan}Running${reset}
+${orange}│${reset}  ${dim}Local:${reset}    ${cyan}${url}${reset}
+${orange}│${reset}
+${orange}╰────────────────────────────────────────────╯${reset}
+  `);
+
+    if (options.open) openBrowser(url);
   });
 
   // Connect to snapwyr events
