@@ -4,11 +4,13 @@
   "description": "Real-time web dashboard for Snapwyr HTTP request logging",
   "type": "module",
   "main": "./dist/server/index.js",
+  "module": "./dist/server/index.mjs",
   "types": "./dist/server/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/server/index.js",
-      "types": "./dist/server/index.d.ts"
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.js"
     }
   },
   "files": [
@@ -20,7 +22,7 @@
     "dev:server": "tsx watch server/index.ts",
     "build:ui": "vite build",
     "build:embed": "tsx scripts/embed-html.ts",
-    "build:server": "tsc -p tsconfig.server.json",
+    "build:server": "tsup",
     "build": "npm run build:ui && npm run build:embed && npm run build:server",
     "preview": "vite preview",
     "clean": "rm -rf dist",
@@ -48,6 +50,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tailwindcss": "^4.0.0",
+    "tsup": "^8.5.1",
     "tsx": "^4.6.2",
     "typescript": "^5.3.3",
     "vite": "^5.0.10",
