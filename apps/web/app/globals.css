@@ -4,7 +4,7 @@
 
 :root {
   --background: #000000;
-  --foreground: #00ff00;
+  --foreground: #ffffff;
 
   /* Fumadocs official CSS variables */
   --fd-sidebar-width: 240px;
@@ -19,131 +19,39 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-mono), 'Courier New', monospace;
+  background: #0d0d0d;
+  color: #ffffff;
+  font-family:
+    'SF Mono',
+    'Fira Code',
+    'Fira Mono',
+    'JetBrains Mono',
+    Menlo,
+    Monaco,
+    'Cascadia Code',
+    monospace,
+    var(--font-geist-sans),
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
   overflow-x: hidden;
   position: relative;
-}
-
-/* Terminal effects only on home page */
-.home-page {
-  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern' 1;
+  text-rendering: optimizeLegibility;
 }
 
 * {
   scroll-behavior: smooth;
-}
-
-/* Terminal cursor effect */
-@keyframes blink {
-  0%,
-  50% {
-    opacity: 1;
-  }
-  51%,
-  100% {
-    opacity: 0;
-  }
-}
-
-.terminal-cursor::after {
-  content: '_';
-  animation: blink 1s infinite;
-  color: #00ff00;
-}
-
-/* Terminal scanline effect */
-@keyframes scanline {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.3;
-  }
-  100% {
-    transform: translateY(100vh);
-    opacity: 0;
-  }
-}
-
-.screen-glitch {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  pointer-events: none;
-  z-index: 9999;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 255, 0, 0.4) 50%,
-    transparent 100%
-  );
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
-  animation: scanline 3s linear infinite;
-}
-
-/* Terminal noise/static effect */
-@keyframes terminalNoise {
-  0%,
-  100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.03;
-  }
-}
-
-.terminal-noise {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9997;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 255, 0, 0.03) 2px,
-      rgba(0, 255, 0, 0.03) 4px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 255, 0, 0.03) 2px,
-      rgba(0, 255, 0, 0.03) 4px
-    );
-  animation: terminalNoise 0.1s infinite;
-}
-
-/* Subtle screen flicker - only on home page */
-@keyframes flicker {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.98;
-  }
-}
-
-.home-page-flicker {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 255, 0, 0.02);
-  pointer-events: none;
-  z-index: 9998;
-  animation: flicker 0.15s infinite;
 }
 
 /* Enhanced Fumadocs sidebar styling */

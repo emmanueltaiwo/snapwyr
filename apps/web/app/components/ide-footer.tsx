@@ -1,0 +1,35 @@
+'use client';
+
+import Link from 'next/link';
+import { GitHubStars } from './github-stars';
+
+export function IDEFooter() {
+  return (
+    <footer className='py-8 px-4 sm:px-6 lg:px-8 border-t border-white/5 bg-[#181818]'>
+      <div className='max-w-7xl mx-auto'>
+        <div className='flex flex-col md:flex-row items-center justify-between gap-4'>
+          <div className='text-white/40 text-xs font-mono text-center md:text-left'>
+            © {new Date().getFullYear()} SnapWyr. Licensed under AGPL-3.0
+          </div>
+          <div className='flex items-center gap-6'>
+            <Link
+              href='/docs'
+              className='text-xs text-white/40 hover:text-white/60 transition-colors font-mono'
+            >
+              docs
+            </Link>
+            <GitHubStars />
+            <a
+              href='https://www.npmjs.com/package/snapwyr'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-xs text-white/40 hover:text-white/60 transition-colors font-mono'
+            >
+              npm
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
