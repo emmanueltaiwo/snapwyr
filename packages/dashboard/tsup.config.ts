@@ -8,4 +8,9 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   outDir: 'dist/server',
+  outExtension({ format }) {
+    return {
+      js: format === 'esm' ? '.mjs' : '.cjs',
+    };
+  },
 });

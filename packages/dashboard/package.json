@@ -1,16 +1,16 @@
 {
   "name": "@snapwyr/dashboard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Real-time web dashboard for Snapwyr HTTP request logging",
   "type": "module",
-  "main": "./dist/server/index.js",
+  "main": "./dist/server/index.cjs",
   "module": "./dist/server/index.mjs",
   "types": "./dist/server/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/server/index.d.ts",
       "import": "./dist/server/index.mjs",
-      "require": "./dist/server/index.js"
+      "require": "./dist/server/index.cjs"
     }
   },
   "files": [

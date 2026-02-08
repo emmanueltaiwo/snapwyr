@@ -1,6 +1,6 @@
 {
   "name": "snapwyr",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Zero-config HTTP request logger for Node.js. Automatically intercepts and logs fetch and axios requests. Perfect for debugging API calls in development.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -169,6 +169,6 @@
   },
   "dependencies": {
     "@snapwyr/core": "^1.0.0",
-    "@snapwyr/dashboard": "^1.0.0"
+    "@snapwyr/dashboard": "^1.0.1"
   }
 }
