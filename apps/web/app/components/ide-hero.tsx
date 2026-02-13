@@ -338,7 +338,7 @@ export function IDEHero() {
           transition={{ delay: 0.5 }}
           className='mb-6 sm:mb-8 font-mono text-white text-xs leading-tight overflow-x-auto'
         >
-          <pre className='text-white overflow-x-auto text-[15px] sm:text-[19px] md:text-lg'>
+          <pre className='text-white overflow-x-auto text-[10px] sm:text-[19px] md:text-lg'>
             {` ____  _      ____  ____  _     ___  _ ____ 
 / ___\\/ \\  /|/  _ \\/  __\\/ \\  /|\\  \\///  __\\
 |    \\| |\\ ||| / \\||  \\/|| |  || \\  / |  \\/|
