@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://snapwyr.dev',
+    url: 'https://snapwyr.xyz',
     title: 'SnapWyr - Zero-config HTTP Request Logger for Node.js',
     description:
       'The first and only zero-config HTTP request logger that automatically intercepts fetch requests. Axios support requires passing your axios instance.',
@@ -61,7 +61,10 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  metadataBase: new URL('https://snapwyr.dev'),
+  metadataBase: new URL('https://snapwyr.xyz'),
+  alternates: {
+    canonical: 'https://snapwyr.xyz',
+  },
 };
 
 export default function RootLayout({
@@ -71,6 +74,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
+      <head>
+        <link
+          rel='alternate'
+          type='text/plain'
+          href='/llms.txt'
+          title='LLM Context - SnapWyr documentation index'
+        />
+        <link
+          rel='alternate'
+          type='text/plain'
+          href='/llms-full.txt'
+          title='LLM Full Context - Complete SnapWyr documentation'
+        />
+      </head>
       <body className={`${geistMono.variable} antialiased`}>
         <RootProvider
           theme={{
